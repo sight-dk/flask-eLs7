@@ -1,60 +1,50 @@
-import uuid
-import hashlib
-import datetime
 from flask import Flask, request, jsonify
-import psycopg2
-import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'secret_key'
 
-# Postgres database connection
-conn = psycopg2.connect(
-    host="containers-us-west-36.railway.app",
-    database="railway",
-    user="postgres",
-    password="QI1B5PcTFIekHXgUjjzo",
-    port = "7775"
-)
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
-# Cursor
-cur = conn.cursor()
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
 
+    def __repr__(self):
+        return f"User('{self.name}', '{self.email}')"
 
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    firstname = data['firstname']
-    lastname = data['lastname']
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    try:
-        cur.execute("INSERT INTO users (username, password, firstname, lastnmae) VALUES (%s, %s, %s, %s)", (username, hashed_password, firstname, lastname))
-        conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+    name = request.json.get('name')
+    email = request.json.get('email')
+    password = request.json.get('password')
 
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    new_user = User(name=name, email=email, password=hashed_password)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User created successfully!'})
 
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data['username']
-    password = data['password']
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    try:
-        cur.execute("SELECT id FROM users WHERE username=%s AND password=%s", (username, hashed_password))
-        user_id = cur.fetchone()
-        if user_id:
-            token = str(uuid.uuid4())
-            expiration = datetime.datetime.now() + datetime.timedelta(hours=1)
-            cur.execute("INSERT INTO sessions (user_id, token, expiration) VALUES (%s, %s, %s)", (user_id[0], token, expiration))
-            conn.commit()
-            return jsonify({'success': True, 'token': token})
-        else:
-            return jsonify({'success': False, 'error': 'Invalid username or password'})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and bcrypt.check_password_hash(user.password, password):
+        return jsonify({'message': 'Logged in successfully!'})
+    else:
+        return jsonify({'message': 'Invalid credentials!'})
 
 if __name__ == '__main__':
-     app.run(debug=True, port=os.getenv("PORT", default=5000))
+    app.run(debug=True)

@@ -1,17 +1,18 @@
 import psycopg2
 from flask import Flask, request, jsonify
 from flask_bcrypt import Bcrypt
-
+import os
 app = Flask(__name__)
 app.secret_key = 'secret_key'
 
 bcrypt = Bcrypt(app)
 
 conn = psycopg2.connect(
-    host="localhost",
-    database="mydatabase",
-    user="myuser",
-    password="mypassword"
+    host="containers-us-west-36.railway.app",
+    database="railway",
+    user="postgres",
+    password="QI1B5PcTFIekHXgUjjzo",
+    port = "7775"
 )
 
 cur = conn.cursor()
@@ -43,4 +44,4 @@ def login():
         return jsonify({'message': 'Invalid credentials!'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=os.getenv("PORT", default=5000))

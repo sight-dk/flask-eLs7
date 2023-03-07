@@ -3,6 +3,7 @@ import hashlib
 import datetime
 from flask import Flask, request, jsonify
 import psycopg2
+import os
 
 app = Flask(__name__)
 
@@ -11,7 +12,8 @@ conn = psycopg2.connect(
     host="containers-us-west-36.railway.app",
     database="railway",
     user="postgres",
-    password="QI1B5PcTFIekHXgUjjzo"
+    password="QI1B5PcTFIekHXgUjjzo",
+    port = "7775"
 )
 
 # Cursor
@@ -55,5 +57,4 @@ def login():
         return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+     app.run(debug=True, port=os.getenv("PORT", default=5000))

@@ -1,1 +1,1 @@
-auth - cookies v1
+auth - cookies

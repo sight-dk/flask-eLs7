@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, session
 import hashlib
 import os
 from datetime import timedelta
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
@@ -57,6 +58,31 @@ def login():
         return response
     else:
         return jsonify({'message': 'Invalid credentials!'})
+
+
+
+
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        session_cookie_value = request.cookies.get('session')
+        if not session_cookie_value:
+            return jsonify({'message': 'You are not authenticated. Please log in.'}), 401
+        # You can also check for other conditions here, like checking if the session cookie has expired.
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    # Do something with the authenticated user
+    # ...
+    return jsonify({'message': 'You are authenticated and authorized to access the dashboard.'})
+
 
 
 if __name__ == '__main__':

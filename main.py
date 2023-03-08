@@ -83,7 +83,11 @@ def dashboard():
     # ...
     return jsonify({'message': 'You are authenticated and authorized to access the dashboard.'})
 
-
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('email', None)
+    return jsonify({'message': 'Logged out successfully!'})
+    
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))

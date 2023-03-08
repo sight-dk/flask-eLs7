@@ -95,11 +95,11 @@ def dashboard():
 def logout():
     session.pop('email', None)
     session.pop('name', None)
-    session.pop('session', None)
+
     response = jsonify({'message': 'Logged out successfully!'})
     response.set_cookie('session', '', expires=0)
     return response
-    # return jsonify({'message': 'Logged out successfully!'})
+    #return jsonify({'message': 'Logged out successfully!'})
 
 
 if __name__ == '__main__':

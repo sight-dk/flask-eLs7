@@ -1,17 +1,18 @@
 import psycopg2
 from flask import Flask, request, jsonify
-import hashlib
+from flask_bcrypt import Bcrypt
 import os
-
 app = Flask(__name__)
 app.secret_key = 'secret_key'
+
+bcrypt = Bcrypt(app)
 
 conn = psycopg2.connect(
     host="containers-us-west-36.railway.app",
     database="railway",
     user="postgres",
     password="QI1B5PcTFIekHXgUjjzo",
-    port="7775"
+    port = "7775"
 )
 
 cur = conn.cursor()
@@ -22,7 +23,7 @@ def register():
     email = request.json.get('email')
     password = request.json.get('password')
 
-    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     cur.execute(f"INSERT INTO users (username, email, password) VALUES ('{name}', '{email}', '{hashed_password}')")
     conn.commit()
@@ -33,14 +34,15 @@ def register():
 def login():
     email = request.json.get('email')
     password = request.json.get('password')
-    hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    hashed_password = bcrypt.generate_password_hash(password)
+
 
     cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, hashed_password))
     user = cur.fetchone()
     print("DONE QUERY")
     print(user)
-
-    if user:
+    
+    if user and bcrypt.check_password_hash(user[3], password):
         return jsonify({'message': 'Logged in successfully!'})
     else:
         return jsonify({'message': 'Invalid credentials!'})

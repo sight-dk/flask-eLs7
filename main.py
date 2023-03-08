@@ -34,6 +34,9 @@ def login():
     email = request.json.get('email')
     password = request.json.get('password')
     hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    print(email)
+    print(hashed_password)
+
 
     cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, hashed_password))
     user = cur.fetchone()

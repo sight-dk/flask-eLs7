@@ -2,13 +2,10 @@ import psycopg2
 from flask import Flask, request, jsonify, session
 import hashlib
 import os
-from flask_cors import CORS, cross_origin
+
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
-
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 
@@ -36,7 +33,7 @@ def register():
     return jsonify({'message': 'User created successfully!'})
 
 @app.route('/login', methods=['POST'])
-@cross_origin()
+
 def login():
     email = request.json.get('email')
     password = request.json.get('password')

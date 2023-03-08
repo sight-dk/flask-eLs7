@@ -1,1 +1,1 @@
-flask auth server - test-3
+flask auth server - test-3 with cors

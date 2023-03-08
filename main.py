@@ -2,7 +2,7 @@ import psycopg2
 from flask import Flask, request, jsonify, session
 import hashlib
 import os
-
+from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
@@ -52,7 +52,9 @@ def login():
         name = user[1]
         print(name)
         print(email)
-        return jsonify({'message': 'Logged in!', 'name': name, 'email': email})
+        response = jsonify({'message': 'Logged in!', 'name': name, 'email': email})
+        response.set_cookie('session', value=session['email'], httponly=True, secure=True, max_age=timedelta(days=30))
+        return response
     else:
         return jsonify({'message': 'Invalid credentials!'})
 

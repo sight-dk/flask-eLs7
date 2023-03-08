@@ -34,12 +34,13 @@ def register():
 def login():
     email = request.json.get('email')
     password = request.json.get('password')
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    hashed_password = bcrypt.generate_password_hash(password)
 
     cur.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, hashed_password))
     user = cur.fetchone()
+    print("DONE QUERY")
     print(user)
-    
+
     if user and bcrypt.check_password_hash(user[3], password):
         return jsonify({'message': 'Logged in successfully!'})
     else:

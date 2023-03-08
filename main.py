@@ -16,7 +16,7 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     name = request.json.get('name')
     email = request.json.get('email')
@@ -46,7 +46,9 @@ def login():
     if user:
         session['email'] = email
         name = user[1]
-        return jsonify({'message': 'Logged in successfully!', 'name': name, 'email': email})
+        print(name)
+        print(email)
+        return jsonify({'message': 'Logged in!', 'name': name, 'email': email})
     else:
         return jsonify({'message': 'Invalid credentials!'})
 

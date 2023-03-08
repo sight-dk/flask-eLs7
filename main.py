@@ -1,5 +1,5 @@
 import psycopg2
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, redirect, url_for
 import hashlib
 import os
 from datetime import timedelta
@@ -95,12 +95,18 @@ def dashboard():
 def logout():
     session.pop('email', None)
     session.pop('name', None)
-
+    session.pop('session', None)
     response = jsonify({'message': 'Logged out successfully!'})
     response.set_cookie('session', '', expires=0)
     return response
     #return jsonify({'message': 'Logged out successfully!'})
-
-
+    
+@app.route('/checklogin')
+def checklogin():
+    session_cookie_value = request.cookies.get('session')
+    if session_cookie_value:
+        return redirect(url_for('dashboard'))
+    else:
+        return jsonify({'message': 'You are not logged in.'}), 401
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))

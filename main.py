@@ -104,6 +104,7 @@ def logout():
 @app.route('/checklogin')
 def checklogin():
     session_cookie_value = request.cookies.get('session')
+    
     if session_cookie_value:
         return jsonify({'message': 'Logged in'})
     else:

@@ -105,7 +105,7 @@ def logout():
 def checklogin():
     session_cookie_value = request.cookies.get('session')
     if session_cookie_value:
-        return redirect(url_for('dashboard'))
+        return jsonify({'message': 'Logged in'})
     else:
         return jsonify({'message': 'You are not logged in.'}), 401
 if __name__ == '__main__':

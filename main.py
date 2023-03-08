@@ -82,8 +82,11 @@ def login_required(f):
 def dashboard():
     # Do something with the authenticated user
     # ...
+    
     if 'name' in session:
         return jsonify({'name': session['name']})
+    else:
+        return jsonify({'message': 'Not logged in'})
 
     
     return jsonify({'message': 'You are authenticated and authorized to access the dashboard.'})
@@ -91,7 +94,12 @@ def dashboard():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('email', None)
-    return jsonify({'message': 'Logged out successfully!'})
+    session.pop('name', None)
+    session.pop('session', None)
+    response = jsonify({'message': 'Logged out successfully!'})
+    response.set_cookie('session', '', expires=0)
+    return response
+    # return jsonify({'message': 'Logged out successfully!'})
 
 
 if __name__ == '__main__':

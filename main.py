@@ -46,7 +46,7 @@ def login():
     if user:
         session['email'] = email
         name = user[1]
-        return jsonify({'message': 'Logged in successfully!'})
+        return jsonify({'message': 'Logged in successfully!', 'name': name, 'email': email})
     else:
         return jsonify({'message': 'Invalid credentials!'})
 

@@ -1,5 +1,5 @@
 import psycopg2
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 import hashlib
 import os
 
@@ -44,6 +44,8 @@ def login():
     print(user)
 
     if user:
+        session['email'] = email
+        name = user[1]
         return jsonify({'message': 'Logged in successfully!'})
     else:
         return jsonify({'message': 'Invalid credentials!'})

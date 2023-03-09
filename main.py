@@ -36,6 +36,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 
 def login():
+    print('Received request:', request.method, request.url, request.headers, request.get_data())
     email = request.json.get('email')
     password = request.json.get('password')
     hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()

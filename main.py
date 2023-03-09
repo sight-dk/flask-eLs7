@@ -33,7 +33,7 @@ def register():
 
     return jsonify({'message': 'User created successfully!'})
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 
 def login():
     email = request.json.get('email')

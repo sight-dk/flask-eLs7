@@ -4,10 +4,14 @@ import hashlib
 import os
 from datetime import timedelta
 from functools import wraps
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
 
+
+
+CORS(app) # enable CORS for all routes
 
 
 conn = psycopg2.connect(
@@ -111,4 +115,4 @@ def checklogin():
     else:
         return jsonify({'message': 'You are not logged in.'}), 401
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+    app.run(debug=True, host = "0.0.0.0", port=os.getenv("PORT", default=5000))
